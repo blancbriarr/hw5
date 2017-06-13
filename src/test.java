@@ -13,15 +13,23 @@ class Node {
         this.left = RBTree.nil;
         this.right = RBTree.nil;
         this.parent = RBTree.nil;
+        black = false;
+    }
+    public Node() {
+        this.val = 0;
+        this.left = RBTree.nil;
+        this.right = RBTree.nil;
+        this.parent = RBTree.nil;
         black = true;
     }
+
     public boolean isLeaf() {
         return left == RBTree.nil && right == RBTree.nil;
     }
 }
 
 class RBTree {
-    static public Node nil = new Node(0);
+    static public Node nil = new Node();
     public Node root = nil;
     RBTree() {
         root = nil;
