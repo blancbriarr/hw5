@@ -170,9 +170,8 @@ class RBTree {
         if (y_original_color == true)
             RB_Delete_Fixup(T, x);
     }
-    public void RB_Delete_Fixup(RBTree T, Node x) {
-        Node w;
-        while ((x != nil)&&(x != T.root)&&(x.black == true)) {
+    public void RB_Delete_Fixup(RBTree T, Node x) {Node w;
+        while (x != root && x.black  == true) {
             if (x == x.parent.left) {
                 w = x.parent.right;
                 if (w.black == false) {
@@ -181,11 +180,11 @@ class RBTree {
                     left_rotate(T, x.parent);
                     w = x.parent.right;
                 }
-                if ((w != nil)&&(w.left.black == true) && (w.right.black == true)) {
+                if (w.left.black == true && w.right.black == true) {
                     w.black = false;
                     x = x.parent;
                 } else {
-                    if ((w != nil)&&(w.right.black == true)) {
+                    if (w.right.black == true) {
                         w.left.black = true;
                         w.black = false;
                         right_rotate(T, w);
@@ -195,11 +194,9 @@ class RBTree {
                     x.parent.black = true;
                     w.right.black = true;
                     left_rotate(T, x.parent);
-                    x = T.root;
+                    x = root;
                 }
-
-            }
-            else {
+            } else {
                 w = x.parent.left;
                 if (w.black == false) {
                     w.black = true;
@@ -207,7 +204,7 @@ class RBTree {
                     right_rotate(T, x.parent);
                     w = x.parent.left;
                 }
-                if ((w != nil)&&(w.left.black == true) && (w.left.black == true)) {
+                if (w.right.black == true && w.left.black == true) {
                     w.black = false;
                     x = x.parent;
                 } else {
@@ -221,10 +218,11 @@ class RBTree {
                     x.parent.black = true;
                     w.left.black = true;
                     right_rotate(T, x.parent);
-                    x = T.root;
+                    x = root;
                 }
             }
         }
+                    x.black  = true;
     }
 
     public void RB_Transplant(RBTree T, Node u, Node v){
