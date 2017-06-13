@@ -21,8 +21,8 @@ class Node {
 }
 
 class RBTree {
-    public Node root = nil;
     static public Node nil = new Node(0);
+    public Node root = nil;
     RBTree() {
         root = nil;
     }
@@ -60,9 +60,9 @@ class RBTree {
     }
 
     public void insert(RBTree tree, Node n) {
-        Node y = tree.nil;
-        Node x = tree.root;
-        while (x != tree.nil) {
+        Node y = nil;
+        Node x = root;
+        while (x != nil) {
             y = x;
             if (n.val < x.val) {
                 x = x.left;
@@ -71,7 +71,7 @@ class RBTree {
         }
         n.parent = y;
 
-        if(y == tree.nil)
+        if(y == nil)
             tree.root = n;
         else if (n.val < y.val)
             y.left = n;
@@ -279,10 +279,10 @@ class RBTree {
         }
     }
 
-    public int GetBlackNode() {
+    int GetBlackNode() {
         return GetBlackNode(root);
     }
-    public int GetBlackNode(Node root) {
+    int GetBlackNode(Node root) {
         if(root == nil) {
             return 0;
         }
@@ -292,7 +292,7 @@ class RBTree {
             return GetBlackNode(root.left) + GetBlackNode(root.right) + tmp;
         }
     }
-    public int GetBlackHeight() {
+    int GetBlackHeight() {
         Node x = root;
         int count = 0;
         while (x != nil) {
@@ -343,17 +343,17 @@ public class test {
                 } else
                     break;
             }
-            br.close();
-            total = inserted + deleted;
-            System.out.println("filename= ");
-            System.out.println("total= " + total);
-            System.out.println("insert= " + inserted);
-            System.out.println("deleted= " + deleted);
-            System.out.println("miss= " + miss);
-            System.out.println("nb= " + rb.GetBlackNode());
-            System.out.println("bh= " + rb.GetBlackHeight());
-            System.out.println("R");
-            System.out.println("B");
         }
+        br.close();
+        total = inserted + deleted;
+        System.out.println("filename= ");
+        System.out.println("total= " + total);
+        System.out.println("insert= " + inserted);
+        System.out.println("deleted= " + deleted);
+        System.out.println("miss= " + miss);
+        System.out.println("nb= " + rb.GetBlackNode());
+        System.out.println("bh= " + rb.GetBlackHeight());
+        System.out.println("R");
+        System.out.println("B");
     }
 }
