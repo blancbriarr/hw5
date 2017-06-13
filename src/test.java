@@ -8,18 +8,19 @@ class Node {
     public Node left, right, parent;
     char color;
     public Node(int newval) {
-        parent = null;
+        parent = RBTree.nil;
         val = newval;
-        left = null;
-        right = null;
+        left = RBTree.nil;
+        right = RBTree.nil;
+        color = 'b';
     }
 }
 
 class RBTree {
     public Node root;
-    public Node nil = null;
+    static public Node nil = new Node(0);
     public RBTree() {
-        root = null;
+        root = nil;
     }
 
     public void insert(RBTree tree, Node n) {
@@ -68,7 +69,7 @@ class RBTree {
             }
             else {
                 Node y = n.parent.parent.left;
-                if(y.color == 'r'){
+                if(y.color == 'r') {
                     n.parent.color = 'b';
                     y.color = 'b';
                     n.parent.parent.color = 'r';
@@ -295,11 +296,39 @@ class Stack {
 public class test {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader("input.txt"));
+        RBTree rb = new RBTree();
+        int miss = 0, inserted = 0, deleted = 0, total = 0;
         while(true) {
             String line = br.readLine();
-            if (line==null) break;
-            System.out.println(line);
+            if (line == null) break;
+            total++;
+            line = line.trim();
+            int num = Integer.parseInt(line);
+            System.out.println(num);
+            if(num > 0) {
+                rb.insert(rb, new Node(num));
+                inserted++;
+            }
+            else if (num < 0) {
+                if(rb.search(rb.root, -num) != null) {
+                    rb.delete(rb, rb.search(rb.root, -num));
+                    deleted++;
+                }
+                else
+                    miss++;
+            }
+            else
+                break;
         }
+        System.out.println("filename= ");
+        System.out.println("total= " + total);
+        System.out.println("insert= " + inserted);
+        System.out.println("deleted= " + deleted);
+        System.out.println("miss= " + miss);
+        System.out.println("nb= ");
+        System.out.println("bh= ");
+        System.out.println("R");
+        System.out.println("B");
         br.close();
     }
 }
