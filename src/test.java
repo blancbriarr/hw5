@@ -82,17 +82,21 @@ class RBTree {
         RB_Insert_Fixup(tree, n);
     }
     public void RB_Insert_Fixup(RBTree T, Node n) {
+        if(n.parent == nil)
+            return;
+        if(n.parent.parent == nil)
+            return;
         while (n.parent.black == false) {
             if (n.parent == n.parent.parent.left) {
                 Node y = n.parent.parent.right;
-                if(y.black == false){
+                if(y.black == false) {
                     n.parent.black = true;
                     y.black = true;
                     n.parent.parent.black = false;
                     n = n.parent.parent;
                 }
                 else {
-                    if (n == n.parent.right){
+                    if (n == n.parent.right) {
                         n = n.parent;
                         left_rotate(T,n);
                     }
@@ -337,12 +341,18 @@ public class test {
             System.out.println(num);
             if (num > 0) {
                 rb.insert(rb, new Node(num));
+                inserted++;
             } else if (num < 0) {
                 if (rb.search(rb.root, -num) != null) {
                     rb.delete(rb, rb.search(rb.root, -num));
-                } else
-                    break;
+                    deleted++;
+                }
+                else {
+                    miss++;
+                }
             }
+            else
+                break;
         }
         br.close();
         total = inserted + deleted;
