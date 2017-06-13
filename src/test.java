@@ -15,6 +15,9 @@ class Node {
         this.parent = RBTree.nil;
         black = true;
     }
+    public boolean isLeaf() {
+        return left == RBTree.nil && right == RBTree.nil;
+    }
 }
 
 class RBTree {
@@ -288,11 +291,21 @@ class RBTree {
             return 0;
         }
         else {
-            return 1;
+            int tmp;
+            tmp = !root.black || root.isLeaf() ? 0 : 1;
+            return GetBlackNode(root.left)+GetBlackNode(root.right) + tmp;
         }
     }
     public int GetBlackHeight() {
-        return 0;
+        Node x = root;
+        int count = 0;
+        while (x != nil) {
+            if(x.black) {
+                count++;
+            }
+            x = x.left;
+        }
+        return count;
     }
 }
 
