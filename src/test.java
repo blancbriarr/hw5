@@ -21,14 +21,42 @@ class Node {
 }
 
 class RBTree {
-    public Node root;
+    public Node root = nil;
     static public Node nil = new Node(0);
     RBTree() {
         root = nil;
     }
-    static int miss = 0, inserted = 0, deleted = 0;
-    static int getTotal(RBTree root) {
-        return inserted - deleted;
+    void left_rotate(RBTree T, Node x) {
+        if (x.right == nil)
+            return;
+        Node y = x.right;
+        x.right = y.left;
+        if(y.left != T.nil)
+            y.left.parent = x;
+        y.parent = x.parent;
+        if(x.parent == T.nil)
+            T.root = y;
+        else if (x == x.parent.left)
+            x.parent.left = y;
+        else x.parent.right = y;
+        y.left = x;
+        x.parent = y;
+    }
+    void right_rotate(RBTree T, Node y) {
+        if (y.left == nil)
+            return;
+        Node x = y.left;
+        y.left = x.right;
+        if(x.right != T.nil)
+            x.right.parent = y;
+        x.parent = y.parent;
+        if(y.parent == T.nil)
+            T.root = x;
+        else if (y == y.parent.right)
+            y.parent.right = x;
+        else y.parent.left = x;
+        x.right = y;
+        y.parent = x;
     }
 
     public void insert(RBTree tree, Node n) {
@@ -53,7 +81,6 @@ class RBTree {
         n.black = false;
         RB_Insert_Fixup(tree, n);
     }
-
     public void RB_Insert_Fixup(RBTree T, Node n) {
         while (n.parent.black == false) {
             if (n.parent == n.parent.parent.left) {
@@ -97,21 +124,6 @@ class RBTree {
         }
     }
 
-    public void Transplant(RBTree T, Node u, Node v){
-        if (u.parent == nil)
-            T.root = v;
-        else if (u == u.parent.left)
-            u.parent.left = v;
-        else u.parent.right = v;
-        if (v != nil)
-            v.parent = u.parent;
-    }
-    public Node Tree_Minimum(Node x) {
-        while (x.left != nil) {
-            x = x.left;
-        }
-        return x;
-    }
     public void delete(RBTree T, Node z) {
         Node y = z;
         Node x;
@@ -143,7 +155,6 @@ class RBTree {
         if (y_original_color == true)
             RB_Delete_Fixup(T, x);
     }
-
     public void RB_Delete_Fixup(RBTree T, Node x) {
         Node w;
         while ((x != T.root)&&(x.black == true)) {
@@ -202,6 +213,22 @@ class RBTree {
         }
     }
 
+    public void Transplant(RBTree T, Node u, Node v){
+        if (u.parent == nil)
+            T.root = v;
+        else if (u == u.parent.left)
+            u.parent.left = v;
+        else u.parent.right = v;
+        if (v != nil)
+            v.parent = u.parent;
+    }
+    public Node Tree_Minimum(Node x) {
+        while (x.left != nil) {
+            x = x.left;
+        }
+        return x;
+    }
+
     public Node search (Node tree, int val) {
         if (tree == null)
             return null;
@@ -230,7 +257,6 @@ class RBTree {
             inorder(tree.right);
         }
     }
-
     public void inorder_iter() {
         if (root == null)
             return;
@@ -253,38 +279,8 @@ class RBTree {
         }
     }
 
-    void left_rotate(RBTree T, Node x) {
-        if (x.right == nil)
-            return;
-        Node y = x.right;
-        x.right = y.left;
-        if(y.left != T.nil)
-            y.left.parent = x;
-        y.parent = x.parent;
-        if(x.parent == T.nil)
-            T.root = y;
-        else if (x == x.parent.left)
-            x.parent.left = y;
-        else x.parent.right = y;
-        y.left = x;
-        x.parent = y;
-    }
-
-    void right_rotate(RBTree T, Node y) {
-        if (y.left == nil)
-            return;
-        Node x = y.left;
-        y.left = x.right;
-        if(x.right != T.nil)
-            x.right.parent = y;
-        x.parent = y.parent;
-        if(y.parent == T.nil)
-            T.root = x;
-        else if (y == y.parent.right)
-            y.parent.right = x;
-        else y.parent.left = x;
-        x.right = y;
-        y.parent = x;
+    public int GetBlackNode() {
+        return GetBlackNode(root);
     }
     public int GetBlackNode(Node root) {
         if(root == nil) {
@@ -293,7 +289,7 @@ class RBTree {
         else {
             int tmp;
             tmp = !root.black || root.isLeaf() ? 0 : 1;
-            return GetBlackNode(root.left)+GetBlackNode(root.right) + tmp;
+            return GetBlackNode(root.left) + GetBlackNode(root.right) + tmp;
         }
     }
     public int GetBlackHeight() {
@@ -331,6 +327,8 @@ public class test {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader("input.txt"));
         RBTree rb = new RBTree();
+        int inserted = 0, deleted = 0, miss = 0;
+        int total;
         while (true) {
             String line = br.readLine();
             if (line == null) break;
@@ -346,13 +344,14 @@ public class test {
                     break;
             }
             br.close();
+            total = inserted + deleted;
             System.out.println("filename= ");
-            System.out.println("total= " + rb.getTotal(rb));
-            System.out.println("insert= " + rb.inserted);
-            System.out.println("deleted= " + rb.deleted);
-            System.out.println("miss= " + rb.miss);
-            System.out.println("nb= ");
-            System.out.println("bh= ");
+            System.out.println("total= " + total);
+            System.out.println("insert= " + inserted);
+            System.out.println("deleted= " + deleted);
+            System.out.println("miss= " + miss);
+            System.out.println("nb= " + rb.GetBlackNode());
+            System.out.println("bh= " + rb.GetBlackHeight());
             System.out.println("R");
             System.out.println("B");
         }
