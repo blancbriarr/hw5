@@ -1,26 +1,31 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 class Node {
     public int val;
     public Node left, right, parent;
-    char color;
-    public Node(int newval) {
-        parent = RBTree.nil;
-        val = newval;
-        left = RBTree.nil;
-        right = RBTree.nil;
-        color = 'b';
+    public boolean black;
+    public Node(int new_val) {
+        this.val = new_val;
+        this.left = RBTree.nil;
+        this.right = RBTree.nil;
+        this.parent = RBTree.nil;
+        black = true;
     }
 }
 
 class RBTree {
     public Node root;
     static public Node nil = new Node(0);
-    public RBTree() {
+    RBTree() {
         root = nil;
+    }
+    static int miss = 0, inserted = 0, deleted = 0;
+    static int getTotal(RBTree root) {
+        return inserted - deleted;
     }
 
     public void insert(RBTree tree, Node n) {
@@ -42,18 +47,18 @@ class RBTree {
         else y.right = n;
         n.left = tree.nil;
         n.right = tree.nil;
-        n.color = 'r';
+        n.black = false;
         RB_Insert_Fixup(tree, n);
     }
 
     public void RB_Insert_Fixup(RBTree T, Node n) {
-        while (n.parent.color == 'r') {
+        while (n.parent.black == false) {
             if (n.parent == n.parent.parent.left) {
                 Node y = n.parent.parent.right;
-                if(y.color == 'r'){
-                    n.parent.color = 'b';
-                    y.color = 'b';
-                    n.parent.parent.color = 'r';
+                if(y.black == false){
+                    n.parent.black = true;
+                    y.black = true;
+                    n.parent.parent.black = false;
                     n = n.parent.parent;
                 }
                 else {
@@ -62,17 +67,17 @@ class RBTree {
                         left_rotate(T,n);
                     }
 
-                    n.parent.color = 'b';
-                    n.parent.parent.color = 'r';
+                    n.parent.black = true;
+                    n.parent.parent.black = false;
                     right_rotate(T,n.parent.parent);
                 }
             }
             else {
                 Node y = n.parent.parent.left;
-                if(y.color == 'r') {
-                    n.parent.color = 'b';
-                    y.color = 'b';
-                    n.parent.parent.color = 'r';
+                if(y.black == false) {
+                    n.parent.black = true;
+                    y.black = true;
+                    n.parent.parent.black = false;
                     n = n.parent.parent;
                 }
                 else {
@@ -80,12 +85,12 @@ class RBTree {
                         n = n.parent;
                         right_rotate(T,n);
                     }
-                    n.parent.color = 'b';
-                    n.parent.parent.color = 'r';
+                    n.parent.black = true;
+                    n.parent.parent.black = false;
                     left_rotate(T,n.parent.parent);
                 }
             }
-            T.root.color = 'b';
+            T.root.black = true;
         }
     }
 
@@ -107,7 +112,7 @@ class RBTree {
     public void delete(RBTree T, Node z) {
         Node y = z;
         Node x;
-        char y_original_color = y.color;
+        boolean y_original_color = y.black;
         if(z.left == T.nil) {
             x = z.right;
             Transplant(T, z, z.right);
@@ -118,7 +123,7 @@ class RBTree {
         }
         else {
             y = Tree_Minimum(z.right);
-            y_original_color = y.color;
+            y_original_color = y.black;
             x = y.right;
             if (y.parent != z) {
                 Transplant(T,y,y.right);
@@ -130,36 +135,36 @@ class RBTree {
             Transplant(T,z,y);
             y.left = z.left;
             y.left.parent = y;
-            y.color = z.color;
+            y.black = z.black;
         }
-        if (y_original_color == 'b')
+        if (y_original_color == true)
             RB_Delete_Fixup(T, x);
     }
 
     public void RB_Delete_Fixup(RBTree T, Node x) {
         Node w;
-        while ((x != T.root)&&(x.color == 'b')) {
+        while ((x != T.root)&&(x.black == true)) {
             if (x == x.parent.left) {
                 w = x.parent.right;
-                if (w.color == 'r') {
-                    w.color = 'b';
-                    x.parent.color = 'r';
+                if (w.black == false) {
+                    w.black = true;
+                    x.parent.black = false;
                     left_rotate(T, x.parent);
                     w = x.parent.right;
                 }
-                if ((w.right.color == 'b') && (w.right.color == 'b')) {
-                    w.color = 'r';
+                if ((w.left.black == true) && (w.right.black == true)) {
+                    w.black = false;
                     x = x.parent;
                 } else {
-                    if (w.right.color == 'b') {
-                        w.left.color = 'b';
-                        w.color = 'r';
+                    if (w.right.black == true) {
+                        w.left.black = true;
+                        w.black = false;
                         right_rotate(T, w);
                         w = x.parent.right;
                     }
-                    w.color = x.parent.color;
-                    x.parent.color = 'b';
-                    w.right.color = 'b';
+                    w.black = x.parent.black;
+                    x.parent.black = true;
+                    w.right.black = true;
                     left_rotate(T, x.parent);
                     x = T.root;
                 }
@@ -167,25 +172,25 @@ class RBTree {
             }
             else {
                 w = x.parent.left;
-                if (w.color == 'r') {
-                    w.color = 'b';
-                    x.parent.color = 'r';
+                if (w.black == false) {
+                    w.black = true;
+                    x.parent.black = false;
                     right_rotate(T, x.parent);
                     w = x.parent.left;
                 }
-                if ((w.left.color == 'b') && (w.left.color == 'b')) {
-                    w.color = 'r';
+                if ((w.left.black == true) && (w.left.black == true)) {
+                    w.black = false;
                     x = x.parent;
                 } else {
-                    if (w.left.color == 'b') {
-                        w.right.color = 'b';
-                        w.color = 'r';
+                    if (w.left.black == true) {
+                        w.right.black = true;
+                        w.black = false;
                         left_rotate(T, w);
                         w = x.parent.left;
                     }
-                    w.color = x.parent.color;
-                    x.parent.color = 'b';
-                    w.left.color = 'b';
+                    w.black = x.parent.black;
+                    x.parent.black = true;
+                    w.left.black = true;
                     right_rotate(T, x.parent);
                     x = T.root;
                 }
@@ -204,16 +209,16 @@ class RBTree {
         else
             return search(tree.right,val);
     }
-    public void print(Node tree, int level) {
-        if (tree.right != null)
+    void print(Node tree, int level) {
+        if (tree.right != nil)
             print(tree.right, level + 1);
         for(int i = 0; i < level; i++)
             System.out.print("    ");
         System.out.println(tree.val);
-        if (tree.left != null)
+        if (tree.left != nil)
             print(tree.left, level + 1);
     }
-    public void inorder(Node tree) {
+    void inorder(Node tree) {
         if (tree == null)
             return;
         else {
@@ -245,7 +250,9 @@ class RBTree {
         }
     }
 
-    public void left_rotate(RBTree T, Node x) {
+    void left_rotate(RBTree T, Node x) {
+        if (x.right == nil)
+            return;
         Node y = x.right;
         x.right = y.left;
         if(y.left != T.nil)
@@ -260,19 +267,32 @@ class RBTree {
         x.parent = y;
     }
 
-    public void right_rotate(RBTree T, Node y) {
+    void right_rotate(RBTree T, Node y) {
+        if (y.left == nil)
+            return;
         Node x = y.left;
         y.left = x.right;
         if(x.right != T.nil)
             x.right.parent = y;
         x.parent = y.parent;
-        if(x.parent == T.nil)
+        if(y.parent == T.nil)
             T.root = x;
         else if (y == y.parent.right)
             y.parent.right = x;
         else y.parent.left = x;
         x.right = y;
         y.parent = x;
+    }
+    public int GetBlackNode(Node root) {
+        if(root == nil) {
+            return 0;
+        }
+        else {
+            return 1;
+        }
+    }
+    public int GetBlackHeight() {
+        return 0;
     }
 }
 
@@ -293,42 +313,35 @@ class Stack {
 
 
 
+
 public class test {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader("input.txt"));
         RBTree rb = new RBTree();
-        int miss = 0, inserted = 0, deleted = 0, total = 0;
-        while(true) {
+        while (true) {
             String line = br.readLine();
             if (line == null) break;
-            total++;
             line = line.trim();
             int num = Integer.parseInt(line);
             System.out.println(num);
-            if(num > 0) {
+            if (num > 0) {
                 rb.insert(rb, new Node(num));
-                inserted++;
-            }
-            else if (num < 0) {
-                if(rb.search(rb.root, -num) != null) {
+            } else if (num < 0) {
+                if (rb.search(rb.root, -num) != null) {
                     rb.delete(rb, rb.search(rb.root, -num));
-                    deleted++;
-                }
-                else
-                    miss++;
+                } else
+                    break;
             }
-            else
-                break;
+            br.close();
+            System.out.println("filename= ");
+            System.out.println("total= " + rb.getTotal(rb));
+            System.out.println("insert= " + rb.inserted);
+            System.out.println("deleted= " + rb.deleted);
+            System.out.println("miss= " + rb.miss);
+            System.out.println("nb= ");
+            System.out.println("bh= ");
+            System.out.println("R");
+            System.out.println("B");
         }
-        System.out.println("filename= ");
-        System.out.println("total= " + total);
-        System.out.println("insert= " + inserted);
-        System.out.println("deleted= " + deleted);
-        System.out.println("miss= " + miss);
-        System.out.println("nb= ");
-        System.out.println("bh= ");
-        System.out.println("R");
-        System.out.println("B");
-        br.close();
     }
 }
